@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load the dataset
-df = pd.read_csv('/mnt/data/winter_2024_data.csv')
+url = "https://github.com/Gazmaths/carmax_analytics/blob/main/winter_2024_data.csv"
+df = pd.read_csv(url)
 
 # Streamlit dashboard title
 st.title("Vehicle Appraisal Dashboard")
