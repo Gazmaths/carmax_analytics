@@ -23,10 +23,6 @@ st.markdown("Explore customer behavior based on trade-ins and purchases at CarMa
 st.sidebar.header("Filter Options")
 states = st.sidebar.multiselect("Select State(s)", options=df['state'].unique(), default=df['state'].unique())
 make_filter = st.sidebar.multiselect("Select Appraised Make(s)", options=df['make_appraisal'].unique(), default=df['make_appraisal'].unique())
-
-# Apply filters
-filtered_df = df[(df['state'].isin(states)) & (df['make_appraisal'].isin(make_filter))]
-
 # 🔦 Highlights
 st.markdown("### 🔍 Dashboard Highlights")
 colA, colB = st.columns(2)
@@ -35,16 +31,16 @@ with colA:
 with colB:
     same_make_pct = (df['make'] == df['make_appraisal']).mean() * 100
     st.metric("% Customers Staying with Same Make", f"{same_make_pct:.2f}%")
-
-st.divider()
+# Apply filters
+filtered_df = df[(df['state'].isin(states)) & (df['make_appraisal'].isin(make_filter))]
 
 # 1. Most common appraised vs purchased makes
-st.subheader("1️⃣ Top Appraised vs Purchased Makes")
+st.subheader("🔁 Top Appraised vs Purchased Makes")
 col1, col2 = st.columns(2)
 with col1:
     top_appraised = filtered_df['make_appraisal'].value_counts().sort_values(ascending=False).head(10)
     fig, ax = plt.subplots()
-    sns.barplot(x=top_appraised.values, y=top_appraised.index, ax=ax)
+    sns.barplot(x=top_appraised.values, y=top_appraised.index, palette="crest", ax=ax)
     ax.set_title("Top 10 Appraised Makes")
     st.pyplot(fig)
     st.caption("This chart shows the 10 most frequently appraised car makes.")
@@ -52,67 +48,26 @@ with col1:
 with col2:
     top_purchased = filtered_df['make'].value_counts().sort_values(ascending=False).head(10)
     fig, ax = plt.subplots()
-    sns.barplot(x=top_purchased.values, y=top_purchased.index, ax=ax)
+    sns.barplot(x=top_purchased.values, y=top_purchased.index, palette="flare", ax=ax)
     ax.set_title("Top 10 Purchased Makes")
     st.pyplot(fig)
     st.caption("This chart shows the 10 most frequently purchased car makes.")
-
-st.divider()
-
-# 2. Filtered State(s) Top 20 Appraised Makes
-st.subheader("2️⃣ Top 20 Makes by Selected State(s)")
-state_make_counts = filtered_df['make_appraisal'].value_counts().sort_values(ascending=False).head(20)
-fig, ax = plt.subplots()
-sns.barplot(x=state_make_counts.values, y=state_make_counts.index, ax=ax)
-ax.set_title("Top 20 Appraised Makes in Selected States")
-st.pyplot(fig)
-st.caption("This chart shows the 20 most common makes in the states you selected.")
-
-st.divider()
-
-# 3. Distribution of Appraised Makes
-st.subheader("3️⃣ Distribution of Appraised Makes")
-make_counts = df['make_appraisal'].value_counts().sort_values(ascending=False).head(20)
-fig, ax = plt.subplots()
-sns.barplot(x=make_counts.values, y=make_counts.index, ax=ax)
-ax.set_title("Distribution of Top 20 Appraised Makes")
-st.pyplot(fig)
-st.caption("This chart shows the 20 most common makes of appraised vehicles.")
-
-st.divider()
-
-# 4. Distribution of models within a selected make
-st.subheader("4️⃣ Distribution of Models within a Selected Make")
-selected_make = st.selectbox("Choose a Make to See Model Distribution", df['make_appraisal'].unique())
-model_counts = df[df['make_appraisal'] == selected_make]['model_appraisal'].value_counts().sort_values(ascending=False).head(20)
-fig, ax = plt.subplots()
-sns.barplot(x=model_counts.values, y=model_counts.index, ax=ax)
-ax.set_title(f"Top 20 Models under {selected_make}")
-st.pyplot(fig)
-st.caption(f"This chart shows the top 20 models appraised under the make: {selected_make}.")
-
-st.divider()
-
-# 5. Appraisal offer vs. purchase price
-st.subheader("5️⃣ Appraisal Offer vs. Purchase Price")
+# 2. Appraisal offer vs. purchase price
+st.subheader("💰 Appraisal Offer vs. Purchase Price")
 fig1, ax1 = plt.subplots()
 sns.scatterplot(data=filtered_df, x='appraisal_offer', y='price', hue='vehicle_type', alpha=0.6, ax=ax1)
 ax1.set_title("Appraisal Offer vs Purchase Price")
 st.pyplot(fig1)
 st.caption("This scatterplot compares the trade-in appraisal offer with the final purchase price, helping identify upgrade or downgrade behavior.")
 
-st.divider()
-
-# 6. Trade-in vs Purchase Vehicle Types
-st.subheader("6️⃣ Vehicle Type Shift: Appraisal vs Purchase")
+# 3. Trade-in vs Purchase Vehicle Types
+st.subheader("🚘 Vehicle Type Shift: Appraisal vs Purchase")
 vehicle_shift = filtered_df.groupby(['vehicle_type_appraisal', 'vehicle_type']).size().unstack().fillna(0)
 st.dataframe(vehicle_shift.style.format(precision=0))
 st.caption("This table shows how vehicle types change from trade-in to purchase.")
 
-st.divider()
-
-# 7. Time between appraisal and purchase
-st.subheader("7️⃣ Days Between Appraisal and Purchase")
+# 4. Time between appraisal and purchase
+st.subheader("⏳ Days Between Appraisal and Purchase")
 fig2, ax2 = plt.subplots()
 sns.histplot(filtered_df['days_since_offer'], bins=30, kde=True, ax=ax2, color="skyblue")
 ax2.set_title("Distribution of Days Between Appraisal and Purchase")
@@ -121,38 +76,51 @@ ax2.set_ylabel("Frequency")
 st.pyplot(fig2)
 st.caption("This histogram shows how long customers typically wait between getting an appraisal and purchasing a vehicle.")
 
-st.divider()
-
-# 8. Online vs In-Person Appraisals
-st.subheader("8️⃣ Online vs In-Person Appraisals")
+# 5. Online vs In-Person Appraisals
+st.subheader("🧑‍💻 Online vs In-Person Appraisals")
 appraisal_type_counts = filtered_df['online_appraisal_flag'].map({0.0: 'In-Person', 1.0: 'Online'}).value_counts()
 fig, ax = plt.subplots()
-sns.barplot(x=appraisal_type_counts.index, y=appraisal_type_counts.values, ax=ax)
+sns.barplot(x=appraisal_type_counts.index, y=appraisal_type_counts.values, palette="pastel", ax=ax)
 ax.set_title("Online vs In-Person Appraisals")
 ax.set_ylabel("Count")
 st.pyplot(fig)
 st.caption("This bar chart compares the number of appraisals done online vs. in-person.")
 
-st.divider()
+# 6. Bar showing distribution of appraised makes
+st.subheader("📊 Distribution of Appraised Makes")
+make_counts = df['make_appraisal'].value_counts().sort_values(ascending=False).head(20)
+fig, ax = plt.subplots()
+sns.barplot(x=make_counts.values, y=make_counts.index, palette="mako", ax=ax)
+ax.set_title("Distribution of Top 20 Appraised Makes")
+st.pyplot(fig)
+st.caption("This chart shows the 20 most common makes of appraised vehicles.")
 
-# 9. Price vs Appraisal Offer by Model + Depreciation
-st.subheader("9️⃣ Price vs Appraisal Offer by Model (with Depreciation)")
+# 7. Distribution of models within a selected make
+st.subheader("🚙 Distribution of Models within a Selected Make")
+selected_make = st.selectbox("Choose a Make to See Model Distribution", df['make_appraisal'].unique())
+model_counts = df[df['make_appraisal'] == selected_make]['model_appraisal'].value_counts().sort_values(ascending=False).head(20)
+fig, ax = plt.subplots()
+sns.barplot(x=model_counts.values, y=model_counts.index, palette="light:#5A9", ax=ax)
+ax.set_title(f"Top 20 Models under {selected_make}")
+st.pyplot(fig)
+st.caption(f"This chart shows the top 20 models appraised under the make: {selected_make}.")
+
+# 8. Price vs Appraisal Offer by Model + Depreciation
+st.subheader("📉 Price vs Appraisal Offer by Model (with Depreciation)")
 df['depreciation_pct'] = ((df['appraisal_offer'] - df['price']) / df['appraisal_offer']) * 100
 depreciation_df = df[['model_appraisal', 'appraisal_offer', 'price', 'depreciation_pct']].dropna()
 top_models = depreciation_df['model_appraisal'].value_counts().head(10).index
 dep_chart_data = depreciation_df[depreciation_df['model_appraisal'].isin(top_models)]
 fig3, ax3 = plt.subplots(figsize=(10, 5))
-sns.barplot(data=dep_chart_data, x='model_appraisal', y='depreciation_pct', ci=None, ax=ax3)
+sns.barplot(data=dep_chart_data, x='model_appraisal', y='depreciation_pct', ci=None, palette="ch:s=.25,rot=-.25", ax=ax3)
 ax3.set_xticklabels(ax3.get_xticklabels(), rotation=45)
 ax3.set_title("Average Depreciation Percentage by Appraised Model")
 ax3.set_ylabel("Depreciation (%)")
 st.pyplot(fig3)
 st.caption("This bar chart shows how much value is typically lost between the appraisal offer and the purchase price, by model.")
 
-st.divider()
-
-# 10. Machine Learning Model to Predict Same-Make Purchases
-st.subheader("🔟 Predicting Same-Make Purchases with Random Forest")
+# 9. Machine Learning Model to Predict Same-Make Purchases
+st.subheader("🤖 Predicting Same-Make Purchases with Random Forest")
 st.markdown("We use a Random Forest Classifier to predict whether a customer will purchase a car from the same make as their appraised vehicle.")
 
 features = [
@@ -183,4 +151,4 @@ report = classification_report(y_test, y_pred, output_dict=True)
 
 st.write("**Classification Report**")
 st.json(report)
-st.caption("The model performs well in identifying customers who switch car makes, but has lower precision for those who stay with the same make. This insight could guide targeted marketing strategies.")
+st.caption("The model performs well in identifying customers who switch car makes, but has lower precision for those who stay with the same make. This insight could guide targeted marketing strategies."
