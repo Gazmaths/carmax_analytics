@@ -31,7 +31,7 @@ filtered_df = df[(df['state'].isin(states)) & (df['make_appraisal'].isin(make_fi
 st.subheader("🔁 Top Appraised vs Purchased Makes")
 col1, col2 = st.columns(2)
 with col1:
-    top_appraised = filtered_df['make_appraisal'].value_counts().sort_values(ascending=True).head(10)
+    top_appraised = filtered_df['make_appraisal'].value_counts().sort_values(descending=True).head(10)
     fig, ax = plt.subplots()
     sns.barplot(x=top_appraised.values, y=top_appraised.index, palette="crest", ax=ax)
     ax.set_title("Top 10 Appraised Makes")
