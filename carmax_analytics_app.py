@@ -40,6 +40,17 @@ st.divider()
 
 # 1. Most common appraised vs purchased makes
 st.subheader("1️⃣ Top Appraised vs Purchased Makes")
+
+# Add comparison table
+st.markdown("#### Comparison Table of Top 20 Appraised vs Purchased Makes")
+top_appraised_full = filtered_df['make_appraisal'].value_counts().head(20).reset_index()
+top_purchased_full = filtered_df['make'].value_counts().head(20).reset_index()
+top_appraised_full.columns = ['Make', 'Appraised Count']
+top_purchased_full.columns = ['Make', 'Purchased Count']
+top_comparison = pd.merge(top_appraised_full, top_purchased_full, on='Make', how='outer').fillna(0)
+top_comparison[['Appraised Count', 'Purchased Count']] = top_comparison[['Appraised Count', 'Purchased Count']].astype(int)
+st.dataframe(top_comparison)
+
 col1, col2 = st.columns(2)
 with col1:
     top_appraised = filtered_df['make_appraisal'].value_counts().sort_values(ascending=False).head(10)
@@ -57,27 +68,33 @@ with col2:
     st.pyplot(fig)
     st.caption("This chart shows the 10 most frequently purchased car makes.")
 
-st.divider()
-
-# 2. Filtered State(s) Top 20 Appraised Makes
-st.subheader("2️⃣ Top 20 Makes by Selected State(s)")
-state_make_counts = filtered_df['make_appraisal'].value_counts().sort_values(ascending=False).head(20)
-fig, ax = plt.subplots()
-sns.barplot(x=state_make_counts.values, y=state_make_counts.index, ax=ax)
-ax.set_title("Top 20 Appraised Makes in Selected States")
-st.pyplot(fig)
-st.caption("This chart shows the 20 most common makes in the states you selected.")
 
 st.divider()
 
-# 3. Distribution of Appraised Makes
-st.subheader("3️⃣ Distribution of Appraised Makes")
-make_counts = df['make_appraisal'].value_counts().sort_values(ascending=False).head(20)
-fig, ax = plt.subplots()
-sns.barplot(x=make_counts.values, y=make_counts.index, ax=ax)
-ax.set_title("Distribution of Top 20 Appraised Makes")
-st.pyplot(fig)
-st.caption("This chart shows the 20 most common makes of appraised vehicles.")
+# 2. Appraised Makes by Selected State - Head and Tail (Side by Side)
+st.subheader("2️⃣ Appraised Makes in Selected State")
+selected_state = st.selectbox("Choose a State to See Appraised Makes Distribution", df['state'].unique())
+state_df = df[df['state'] == selected_state]
+state_make_counts = state_df['make_appraisal'].value_counts()
+
+col1, col2 = st.columns(2)
+with col1:
+    st.markdown("#### Top 10 Makes (Head)")
+    top_makes = state_make_counts.head(10)
+    fig1, ax1 = plt.subplots()
+    sns.barplot(x=top_makes.values, y=top_makes.index, ax=ax1)
+    ax1.set_title(f"Top 10 Appraised Makes in {selected_state}")
+    st.pyplot(fig1)
+
+with col2:
+    st.markdown("#### Bottom 10 Makes (Tail)")
+    tail_makes = state_make_counts.tail(10)
+    fig2, ax2 = plt.subplots()
+    sns.barplot(x=tail_makes.values, y=tail_makes.index, ax=ax2)
+    ax2.set_title(f"Bottom 10 Appraised Makes in {selected_state}")
+    st.pyplot(fig2)
+
+st.caption("These charts display the most and least frequently appraised car makes in the selected state.")
 
 st.divider()
 
