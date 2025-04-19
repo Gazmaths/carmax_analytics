@@ -29,10 +29,12 @@ filtered_df = df[(df['state'].isin(states)) & (df['make_appraisal'].isin(make_fi
 
 # 🔦 Highlights
 st.markdown("### 🔍 Dashboard Highlights")
-colA, colB = st.columns(2)
+colA, colB, colC = st.columns(3)
 with colA:
     st.metric("Total Unique Appraised Makes", len(df['make_appraisal'].unique()))
 with colB:
+    st.metric("Total Unique Purchased Makes", len(df['make'].unique()))    
+with colC:
     same_make_pct = (df['make'] == df['make_appraisal']).mean() * 100
     st.metric("% Customers Staying with Same Make", f"{same_make_pct:.2f}%")
 
