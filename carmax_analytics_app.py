@@ -23,14 +23,7 @@ st.markdown("Explore customer behavior based on trade-ins and purchases at CarMa
 st.sidebar.header("Filter Options")
 states = st.sidebar.multiselect("Select State(s)", options=df['state'].unique(), default=df['state'].unique())
 make_filter = st.sidebar.multiselect("Select Appraised Make(s)", options=df['make_appraisal'].unique(), default=df['make_appraisal'].unique())
-# 🔦 Highlights
-st.markdown("### 🔍 Dashboard Highlights")
-colA, colB = st.columns(2)
-with colA:
-    st.metric("Total Unique Appraised Makes", len(df['make_appraisal'].unique()))
-with colB:
-    same_make_pct = (df['make'] == df['make_appraisal']).mean() * 100
-    st.metric("% Customers Staying with Same Make", f"{same_make_pct:.2f}%")
+
 # Apply filters
 filtered_df = df[(df['state'].isin(states)) & (df['make_appraisal'].isin(make_filter))]
 
@@ -151,4 +144,6 @@ report = classification_report(y_test, y_pred, output_dict=True)
 
 st.write("**Classification Report**")
 st.json(report)
-st.caption("The model performs well in identifying customers who switch car makes, but has lower precision for those who stay with the same make. This insight could guide targeted marketing strategies."
+st.caption("The model performs well in identifying customers who switch car makes, but has lower precision for those who stay with the same make. This insight could guide targeted marketing strategies.")
+
+
