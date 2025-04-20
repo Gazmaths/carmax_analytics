@@ -44,14 +44,22 @@ st.divider()
 st.subheader("1️⃣ Top Appraised vs Purchased Makes")
 
 # Add comparison table
-st.markdown("#### Comparison Table of Top 20 Appraised vs Purchased Makes")
-top_appraised_full = filtered_df['make_appraisal'].value_counts().head(20).reset_index()
-top_purchased_full = filtered_df['make'].value_counts().head(20).reset_index()
+# 1. Comparison Table of Top 10 Appraised vs Purchased Makes
+st.subheader("1️⃣ Top Appraised vs Purchased Makes")
+top_appraised_full = filtered_df['make_appraisal'].value_counts().sort_values(ascending=False).head(10).reset_index()
+top_purchased_full = filtered_df['make'].value_counts().sort_values(ascending=False).head(10).reset_index()
+
 top_appraised_full.columns = ['Make', 'Appraised Count']
 top_purchased_full.columns = ['Make', 'Purchased Count']
+
 top_comparison = pd.merge(top_appraised_full, top_purchased_full, on='Make', how='outer').fillna(0)
+
+# Ensure the counts are integer values
 top_comparison[['Appraised Count', 'Purchased Count']] = top_comparison[['Appraised Count', 'Purchased Count']].astype(int)
+
+# Display the dataframe
 st.dataframe(top_comparison)
+
 
 col1, col2 = st.columns(2)
 with col1:
@@ -71,7 +79,25 @@ with col2:
     st.caption("This chart shows the 10 most frequently purchased car makes.")
 st.divider()
 
-# 2. Appraised Makes by Selected State - Head and Tail (Side by Side)
+# 2. Map visualization for appraised cars by state
+st.subheader("2️⃣ Map of Appraised Cars by State")
+
+# Group by state and count the number of appraisals
+state_appraisal_count = filtered_df['state'].value_counts().reset_index()
+state_appraisal_count.columns = ['State', 'Appraisal Count']
+
+# Using Plotly Express to create a choropleth map
+fig = px.choropleth(state_appraisal_count,
+                    locations='State',
+                    locationmode='USA-states',
+                    color='Appraisal Count',
+                    hover_name='State',
+                    color_continuous_scale="Viridis",
+                    labels={'Appraisal Count': 'Number of Appraisals'},
+                    title="Map of Appraised Cars by State")
+st.plotly_chart(fig)
+
+# 3. Appraised Makes by Selected State - Head and Tail (Side by Side)
 st.subheader("2️⃣ Appraised Makes in Selected State")
 selected_state = st.selectbox("Choose a State to See Appraised Makes Distribution", df['state'].unique())
 state_df = df[df['state'] == selected_state]
