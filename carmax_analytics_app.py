@@ -95,6 +95,8 @@ fig = px.choropleth(state_appraisal_count,
                     color_continuous_scale="Viridis",
                     labels={'Appraisal Count': 'Number of Appraisals'},
                     title="Map of Appraised Cars by State")
+# Limit the map to only show the USA
+fig.update_geos(scope="usa")
 st.plotly_chart(fig)
 
 # 3. Appraised Makes by Selected State - Head and Tail (Side by Side)
