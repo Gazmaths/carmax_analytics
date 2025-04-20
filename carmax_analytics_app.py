@@ -7,7 +7,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import LabelEncoder
 import numpy as np
-
+import plotly.express as px
 # Load data
 @st.cache_data
 def load_data():
