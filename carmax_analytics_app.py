@@ -9,7 +9,7 @@ from sklearn.preprocessing import LabelEncoder
 import numpy as np
 
 # Load data
-@st.cache_data
+
 def load_data():
     df = pd.read_csv("winter_2024_data.csv")
     return df
