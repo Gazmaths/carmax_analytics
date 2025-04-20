@@ -40,9 +40,6 @@ with colC:
 
 st.divider()
 
-# 1. Most common appraised vs purchased makes
-st.subheader("1️⃣ Top Appraised vs Purchased Makes")
-
 # Add comparison table
 # 1. Comparison Table of Top 10 Appraised vs Purchased Makes
 st.subheader("1️⃣ Top Appraised vs Purchased Makes")
